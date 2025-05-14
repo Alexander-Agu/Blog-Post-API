@@ -6,7 +6,7 @@ namespace Blog.App.API.Mapping;
 
 public static class UserMapping
 {
-    public static User ToEntity(CreateUser createUser)
+    public static User ToEntity(this CreateUser createUser)
     {
         return new()
         {
@@ -17,7 +17,7 @@ public static class UserMapping
         };
     }
 
-    public static UserDto ToDto(User user)
+    public static UserDto ToDto(this User user)
     {
         return new(
             Firstname: user.Firstname,
