@@ -36,7 +36,7 @@ public static class PostEndpoints
         // GET - get post by userId and postId
         group.MapGet("/{userId}/{postId}", async (int userId, int postId, BlogAppContext dbContext) =>
         {
-            Post? post = dbContext.Posts.Where(x => x.UserId == userId && x.Id == postId).FirstOrDefault();
+            Post? post = await dbContext.Posts.Where(x => x.UserId == userId && x.Id == postId).FirstOrDefaultAsync();
 
             return post is null ? Results.NotFound() : Results.Ok(post.ToDto());
         })
