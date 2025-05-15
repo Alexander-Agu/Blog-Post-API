@@ -12,7 +12,7 @@ public static class UserEndpoints
 {
     public static RouteGroupBuilder MapUserEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("blog/user").WithParameterValidation();
+        var group = app.MapGroup("blog/user");
         string getUserEndpoint = "GetUser";
 
 
@@ -49,6 +49,47 @@ public static class UserEndpoints
         })
         .WithParameterValidation();
 
+
+        // PUT - updates user information
+        group.MapPut("/{id}", async (int id, UpdateUser updateUser, BlogAppContext dbContext) =>
+        {
+            User? user = await dbContext.Users.FindAsync(id);
+            if (user is null) Results.NotFound();
+
+            // Checking if user is trying to update First or Last names
+            if (updateUser.Firstname != "") user.Firstname = updateUser.Firstname;
+            if (updateUser.Lastname != "") user.Lastname = updateUser.Lastname;
+
+
+            // Checking if user is trying to update Email
+            if (updateUser.Email != "")
+            {
+                // Checks if email already exists within the DB
+                bool emailExist = await dbContext.Users.AnyAsync(x => x.Email == updateUser.Email);
+                if (emailExist) return Results.Conflict(new { message = "Email already exists!" });
+                else
+                {
+                    user.Email = updateUser.Email;
+                }
+            }
+
+
+            // Checking if user is trying to update Password
+            if (updateUser.Password != "")
+            {
+                // Validates password
+                if (!ValidatePassword(updateUser.Password)) return Results.Conflict(new { message = "Create a new better password!" });
+                else
+                {
+                    user.Password = updateUser.Password;
+                }
+            }
+
+            await dbContext.SaveChangesAsync();
+
+            return Results.CreatedAtRoute(getUserEndpoint, new { id = user.Id }, user.ToDto());
+        });
+
         return group;
     }
 
@@ -67,7 +108,7 @@ public static class UserEndpoints
 
             if (char.IsLower(password, x)) lower = true; // Checks if password has a lowercase letter
 
-            if ("!@#$%^&*()_".Contains(password[x])) special = true; // Checks if password has special characters
+            if ("!@#$%^&*()_{}:''?//><|".Contains(password[x])) special = true; // Checks if password has special characters
 
             if (number && special && lower && upper) break; // If all these conditions have been met stop checking
         }
