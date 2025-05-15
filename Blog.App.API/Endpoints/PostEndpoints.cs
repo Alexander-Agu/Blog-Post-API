@@ -3,6 +3,7 @@ using Blog.App.API.Data;
 using Blog.App.API.Dtos.PostDto;
 using Blog.App.API.Entities;
 using Blog.App.API.Mapping;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace Blog.App.API.Endpoints;
@@ -16,6 +17,19 @@ public static class PostEndpoints
 
 
         // GET - get all user posts
+        group.MapGet("/{userId}", async (int userId, BlogAppContext dbContext) =>
+        {
+            List<PostDto> posts = await dbContext.Posts.Where(x => x.UserId == userId)
+            .Select(post => new PostDto
+            (
+                post.UserId,
+                post.Title,
+                post.Content
+            ))
+            .ToListAsync();
+
+            return Results.Ok(posts);
+        });
 
 
         // GET - get post by userId and postId
