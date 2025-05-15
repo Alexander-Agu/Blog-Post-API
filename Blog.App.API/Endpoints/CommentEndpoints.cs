@@ -75,6 +75,20 @@ public static class CommentEndpoints
 
             return Results.CreatedAtRoute(commentGetEndpoint, new { postId = Id, commentId = comment.Id }, comment.ToDto());
         });
+
+
+        // DELETE - delete comment
+        group.MapDelete("/{postId}/{commentId}", async (int postId, int commentId, BlogAppContext dbContext) =>
+        {
+            Comment? comment = await dbContext.Comments.Where(x => x.PostId == postId && x.Id == commentId)
+            .FirstOrDefaultAsync();
+            if (comment is null) return Results.NotFound();
+
+            await dbContext.Comments.Where(x => x.PostId == postId && x.Id == commentId)
+            .ExecuteDeleteAsync();
+
+            return Results.NoContent();
+        });
         return group;
     }
 }
