@@ -17,7 +17,19 @@ public static class UserEndpoints
 
 
         // GET - gets all users
-        group.MapGet("/", async (BlogAppContext dbContext) => await dbContext.Users.ToListAsync());
+        group.MapGet("/", async (BlogAppContext dbContext) =>
+        {
+            List<UserDto> users = await dbContext.Users
+            .Select(user => new UserDto
+            (
+                user.Firstname,
+                user.Lastname,
+                user.Id
+            ))
+            .ToListAsync();
+
+            return Results.Ok(users);
+        });
 
 
         // GET - gets user by ID
