@@ -8,6 +8,7 @@ builder.Services.AddSqlite<BlogAppContext>(connString);
 var app = builder.Build();
 
 app.MapUserEndpoints();
+app.MapPostEndpoints();
 await app.MigrateAsync();
 
 
