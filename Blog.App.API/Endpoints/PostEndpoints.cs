@@ -76,7 +76,19 @@ public static class PostEndpoints
         });
 
 
+        // DELETE - delete post by user and post Id
+        group.MapDelete("/{userId}/{postId}", async (int userId, int postId, BlogAppContext dbContext) =>
+        {
+            Post? post = await dbContext.Posts.Where(x => x.UserId == userId && x.Id == postId)
+            .FirstOrDefaultAsync();
 
+            if (post is null) return Results.NotFound();
+
+            await dbContext.Posts.Where(x => x.UserId == userId && x.Id == postId)
+            .ExecuteDeleteAsync();
+            await dbContext.SaveChangesAsync();
+            return Results.NoContent();
+        });
 
         return group;
     }
