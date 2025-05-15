@@ -17,6 +17,17 @@ public static class UserMapping
         };
     }
 
+    public static User ToEntity(this UpdateUser updateUser)
+    {
+        return new()
+        {
+            Firstname = updateUser.Firstname,
+            Lastname = updateUser.Lastname,
+            Email = updateUser.Email,
+            Password = updateUser.Password
+        };
+    }
+
     public static UserDto ToDto(this User user)
     {
         return new(
