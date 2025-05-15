@@ -45,6 +45,19 @@ public static class CommentEndpoints
         .WithName(commentGetEndpoint);
 
 
+        // POST - create a comment by postId
+        group.MapPost("/{Id}", async (int Id, CreateComment create, BlogAppContext dbContext) =>
+        {
+            Post? post = await dbContext.Posts.FindAsync(Id);
+            if (post is null) return Results.NotFound();
+
+            Comment comment = create.ToEntity(Id);
+
+            await dbContext.Comments.AddAsync(comment);
+            await dbContext.SaveChangesAsync();
+
+            return Results.CreatedAtRoute(commentGetEndpoint, new { postId = Id, commentId = comment.Id }, comment.ToDto());
+        });
         return group;
     }
 }

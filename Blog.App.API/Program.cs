@@ -9,6 +9,7 @@ var app = builder.Build();
 
 app.MapUserEndpoints();
 app.MapPostEndpoints();
+app.MapCommentEndpoints();
 await app.MigrateAsync();
 
 
