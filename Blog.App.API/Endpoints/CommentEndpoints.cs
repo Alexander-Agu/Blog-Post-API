@@ -58,6 +58,23 @@ public static class CommentEndpoints
 
             return Results.CreatedAtRoute(commentGetEndpoint, new { postId = Id, commentId = comment.Id }, comment.ToDto());
         });
+
+
+        // PUT - update comment
+        group.MapPut("/{Id}/{commentId}", async (int Id, int commentId, UpdateComment update, BlogAppContext dbContext) =>
+        {
+            Post? post = await dbContext.Posts.FindAsync(Id);
+            if (post is null) return Results.NotFound();
+
+            Comment? comment = await dbContext.Comments.Where(x => x.PostId == Id && x.Id == commentId)
+            .FirstOrDefaultAsync();
+
+            if (comment.Content != "") comment.Content = update.Content;
+
+            await dbContext.SaveChangesAsync();
+
+            return Results.CreatedAtRoute(commentGetEndpoint, new { postId = Id, commentId = comment.Id }, comment.ToDto());
+        });
         return group;
     }
 }
