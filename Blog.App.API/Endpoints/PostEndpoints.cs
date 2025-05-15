@@ -22,6 +22,7 @@ public static class PostEndpoints
             List<PostDto> posts = await dbContext.Posts.Where(x => x.UserId == userId)
             .Select(post => new PostDto
             (
+                post.Id,
                 post.UserId,
                 post.Title,
                 post.Content

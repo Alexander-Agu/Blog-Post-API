@@ -28,6 +28,7 @@ public static class PostMapping
     public static PostDto ToDto(this Post post)
     {
         return new(
+            Id: post.Id,
             UserId: post.UserId,
             Title: post.Title,
             Content: post.Content
