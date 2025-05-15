@@ -90,6 +90,19 @@ public static class UserEndpoints
             return Results.CreatedAtRoute(getUserEndpoint, new { id = user.Id }, user.ToDto());
         });
 
+
+        // DELETE - delete user by ID
+        group.MapDelete("/{id}", async (int id, BlogAppContext dbContext) =>
+        {
+            User? user = await dbContext.Users.FindAsync(id);
+            if (user is null) return Results.NotFound();
+
+            await dbContext.Users.Where(x => x.Id == id).ExecuteDeleteAsync();
+            await dbContext.SaveChangesAsync();
+
+            return Results.NoContent();
+        });
+
         return group;
     }
 
